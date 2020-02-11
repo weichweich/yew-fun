@@ -7,13 +7,11 @@ use yew::{
     Component, ComponentLink, ShouldRender,
 };
 
-use yew_router::{
-    components::RouterButton, route::Route, router::Router, switch::Permissive, Switch,
-};
+use yew_router::{components::RouterButton, route::Route, router::Router, Switch};
 
 // use crate::pages::home;
 
-const KEY: &'static str = "yew.funfun.self";
+// const KEY: &str = "yew.funfun.self";
 
 pub struct App {
     storage: StorageService,
@@ -27,10 +25,8 @@ pub enum Msg {
     Nope,
 }
 
-#[derive(Debug, Switch, PartialEq, Clone)]
+#[derive(Switch, Debug, PartialEq, Clone)]
 pub enum AppRoute {
-    #[to = "/"]
-    Home,
     #[to = "/about"]
     About,
     #[to = "/services"]
@@ -38,7 +34,9 @@ pub enum AppRoute {
     #[to = "/contact"]
     Contact,
     #[to = "/page-not-found"]
-    NotFound(Permissive<String>),
+    NotFound(String),
+    #[to = "/home"]
+    Home,
 }
 
 impl Component for App {
@@ -53,10 +51,11 @@ impl Component for App {
     }
 
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+        info!("update!");
         false
     }
 
-    fn view(&self) -> VNode<Self> {
+    fn view(&self) -> VNode {
         info!("rendered!");
         html! {
         <div id="layout">
@@ -78,8 +77,9 @@ impl Component for App {
                     </ul>
                 </div>
             </div>
-            <Router<Self, AppRoute, ()>
+            <Router<AppRoute>
                 render = Router::render(|switch: AppRoute| {
+                    info!("render! {:?}", switch);
                     match switch {
                         AppRoute::Home => html!{ "Home" },
                         AppRoute::About => html!{ "About" },
@@ -89,11 +89,11 @@ impl Component for App {
                     }
                 })
                 redirect = Router::redirect(|route: Route| {
-                    AppRoute::NotFound(Permissive(Some(route.route)))
+                    AppRoute::NotFound(route.route)
                 })
             />
         </div>
-                }
+        }
     }
 }
 
